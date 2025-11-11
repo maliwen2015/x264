@@ -55,7 +55,8 @@ extern uint32_t x264_trellis_cabac_phase2(int i, const int b_ac, const dctcoef *
         uint32_t *entropy012_xor,const uint32_t level_state0489,uint32_t *cur_cabac4, uint32_t *cur_level4567,
         const uint16_t *const cabac_size_unary_5, const uint64_t level_state01234567, const int switched, int *leveli, dctcoef *dcti, const int last_nnz, uint32_t *level_tree);
 
-int trellis_cabac_sve(
+#define x264_trellis_cabac_sve x264_template(trellis_cabac_sve)
+int x264_trellis_cabac_sve(
     const int *restrict const unquant_mf, const uint8_t *restrict const zigzag,
     const uint64_t lambda2, const int last_nnz,
     const dctcoef *restrict const orig_coefs, const dctcoef *restrict const quant_coefs,
@@ -134,7 +135,7 @@ int x264_trellis_cabac_4x4_sve( TRELLIS_PARAMS, int b_ac ) {
     const int i_psy_trellis = 0;
     const int b_interlaced = 0;
     const int dc = 0;
-    return trellis_cabac_sve(TRELLIS_ARGS);
+    return x264_trellis_cabac_sve(TRELLIS_ARGS);
 }
 
 #define x264_trellis_cabac_4x4_psy_sve x264_template(trellis_cabac_4x4_psy_sve)
@@ -142,7 +143,7 @@ int x264_trellis_cabac_4x4_psy_sve ( TRELLIS_PARAMS, int b_ac, dctcoef *fenc_dct
     const int i_coefs = 16;
     const int dc = 0;
     const int b_interlaced = 0;
-    return trellis_cabac_sve(TRELLIS_ARGS);
+    return x264_trellis_cabac_sve(TRELLIS_ARGS);
 }
 
 #define x264_trellis_cabac_8x8_sve x264_template(trellis_cabac_8x8_sve)
@@ -152,7 +153,7 @@ int x264_trellis_cabac_8x8_sve( TRELLIS_PARAMS, int b_interlaced ) {
     const int b_ac = 0;
     const dctcoef *fenc_dct = NULL;
     const int i_psy_trellis = 0;
-    return trellis_cabac_sve(TRELLIS_ARGS);
+    return x264_trellis_cabac_sve(TRELLIS_ARGS);
 }
 
 #define x264_trellis_cabac_8x8_psy_sve x264_template(trellis_cabac_8x8_psy_sve)
@@ -160,7 +161,7 @@ int x264_trellis_cabac_8x8_psy_sve ( TRELLIS_PARAMS, int b_interlaced, dctcoef *
     const int i_coefs = 64;
     const int dc = 0;
     const int b_ac = 0;
-    return trellis_cabac_sve(TRELLIS_ARGS);
+    return x264_trellis_cabac_sve(TRELLIS_ARGS);
 }
 
 #define x264_trellis_cabac_chroma_422_dc_sve x264_template(trellis_cabac_chroma_422_dc_sve)
@@ -171,7 +172,7 @@ int x264_trellis_cabac_chroma_422_dc_sve ( TRELLIS_PARAMS ) {
     const dctcoef *fenc_dct = NULL;
     const int i_psy_trellis = 0;
     const int b_interlaced = 0;
-    return trellis_cabac_sve(TRELLIS_ARGS);
+    return x264_trellis_cabac_sve(TRELLIS_ARGS);
 }
 
 #define x264_trellis_cabac_dc_sve x264_template(trellis_cabac_dc_sve)
@@ -181,6 +182,6 @@ int x264_trellis_cabac_dc_sve ( TRELLIS_PARAMS, int i_coefs ) {
     const dctcoef *fenc_dct = NULL;
     const int i_psy_trellis = 0;
     const int b_interlaced = 0;
-    return trellis_cabac_sve(TRELLIS_ARGS);
+    return x264_trellis_cabac_sve(TRELLIS_ARGS);
 }
 
