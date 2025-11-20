@@ -48,6 +48,9 @@
 #if HAVE_LSX
 #   include "loongarch/pixel.h"
 #endif
+#if HAVE_RISCV64
+#   include "riscv64/pixel.h"
+#endif
 
 /****************************************************************************
  * pixel_sad_WxH
@@ -1649,6 +1652,19 @@ void x264_pixel_init( uint32_t cpu, x264_pixel_function_t *pixf )
     }
 #endif /* HAVE_LSX */
 
+#if HAVE_RISCV64
+    if( cpu&X264_CPU_RVV256 )
+    {
+        INIT8( sad, _rvv256 );
+        INIT8( ssd, _rvv256 );
+        INIT7( sad_x3, _rvv256 );
+        INIT7( sad_x4, _rvv256 );
+        pixf->var[PIXEL_8x8]    = x264_pixel_var_8x8_rvv256;
+        pixf->var[PIXEL_8x16]   = x264_pixel_var_8x16_rvv256;
+        pixf->var[PIXEL_16x16]  = x264_pixel_var_16x16_rvv256;
+    }
+#endif /* HAVE_RISCV */
+
 #endif // HIGH_BIT_DEPTH
 #if HAVE_ALTIVEC
     if( cpu&X264_CPU_ALTIVEC )
@@ -1662,4 +1678,3 @@ void x264_pixel_init( uint32_t cpu, x264_pixel_function_t *pixf )
     pixf->ads[PIXEL_4x8] = pixf->ads[PIXEL_16x8];
     pixf->ads[PIXEL_4x4] = pixf->ads[PIXEL_8x8];
 }
-
