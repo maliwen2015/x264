@@ -44,6 +44,9 @@
 #if HAVE_LSX
 #   include "loongarch/mc.h"
 #endif
+#if HAVE_RISCV64
+#   include "riscv64/mc.h"
+#endif
 
 
 static inline void pixel_avg( pixel *dst,  intptr_t i_dst_stride,
@@ -692,6 +695,9 @@ void x264_mc_init( uint32_t cpu, x264_mc_functions_t *pf, int cpu_independent )
 #endif
 #if HAVE_LSX
     x264_mc_init_loongarch( cpu, pf );
+#endif
+#if HAVE_RISCV64
+    x264_mc_init_riscv64( cpu, pf );
 #endif
 
     if( cpu_independent )

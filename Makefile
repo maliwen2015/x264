@@ -199,9 +199,10 @@ ifeq ($(SYS_ARCH),RISCV64)
 ifneq ($(findstring HAVE_RVV 1, $(CONFIG)),)
 SRCASM   = common/riscv64/cpu.S
 
-SRCASM_X = common/riscv64/pixel-a.S
+SRCASM_X = common/riscv64/pixel-a.S \
+           common/riscv64/mc-a.S
 
-SRCS_X  +=
+SRCS_X  += common/riscv64/mc-c.c
 
 OBJASM += $(SRCASM:%.S=%.o)
 ifneq ($(findstring HAVE_BITDEPTH8 1, $(CONFIG)),)
