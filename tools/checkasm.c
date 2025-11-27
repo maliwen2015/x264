@@ -224,6 +224,7 @@ static void print_bench(void)
                     b->cpu&X264_CPU_ARMV8 ? "armv8" :
 #elif ARCH_RISCV64
                     b->cpu&X264_CPU_RVV ? "rvv" :
+                    b->cpu&X264_CPU_RVV256 ? "rvv256" :
 #elif ARCH_MIPS
                     b->cpu&X264_CPU_MSA ? "msa" :
 #elif ARCH_LOONGARCH
@@ -3025,6 +3026,8 @@ static int check_all_flags( void )
 #elif ARCH_RISCV64
     if( cpu_detect & X264_CPU_RVV )
         ret |= add_flags( &cpu0, &cpu1, X264_CPU_RVV, "RVV" );
+    if( cpu_detect & X264_CPU_RVV256 )
+        ret |= add_flags( &cpu0, &cpu1, X264_CPU_RVV256, "RVV256" );
 #elif ARCH_MIPS
     if( cpu_detect & X264_CPU_MSA )
         ret |= add_flags( &cpu0, &cpu1, X264_CPU_MSA, "MSA" );

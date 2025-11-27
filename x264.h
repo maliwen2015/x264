@@ -184,6 +184,7 @@ typedef struct x264_nal_t
 
 /* RISCV64 */
 #define X264_CPU_RVV             0x0000001U  /* RISCV64 RVV */
+#define X264_CPU_RVV256          0x0000002U  /* RISCV64 RVV (VLEN=256+) */
 
 /* MIPS */
 #define X264_CPU_MSA             0x0000001U  /* MIPS MSA */

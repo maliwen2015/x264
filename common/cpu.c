@@ -465,6 +465,8 @@ uint32_t x264_cpu_detect( void )
 
 #define HWCAP_RISCV64_RVV     (1 << ('V' - 'A'))
 
+int x264_get_vlenb( void );
+
 uint32_t x264_cpu_detect( void )
 {
     uint32_t flags = 0;
@@ -472,8 +474,11 @@ uint32_t x264_cpu_detect( void )
 #if HAVE_GETAUXVAL || HAVE_ELF_AUX_INFO
     unsigned long hwcap = x264_getauxval( AT_HWCAP );
 
-    if ( hwcap & HWCAP_RISCV64_RVV )
+    if ( hwcap & HWCAP_RISCV64_RVV ) {
         flags |= X264_CPU_RVV;
+        if ( x264_get_vlenb() >= 32 )
+            flags |= X264_CPU_RVV256;
+    }
 #else
 #if HAVE_RVV
     flags |= X264_CPU_RVV;
