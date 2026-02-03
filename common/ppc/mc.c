@@ -432,7 +432,7 @@ static void mc_chroma_2xh( uint8_t *dstu, uint8_t *dstv, intptr_t i_dst_stride,
 #ifdef WORDS_BIGENDIAN
 #define VSLD_CHROMA(a,b,n) vec_sld(a,b,n)
 #else
-#define VSLD_CHROMA(a,b,n) vec_sld(a,b,n)
+#define VSLD_CHROMA(a,b,n) vec_sld(b,a,16-n)
 #endif
 
 #ifndef __POWER9_VECTOR__
@@ -451,11 +451,10 @@ static void mc_chroma_4xh_altivec( uint8_t *dstu, uint8_t *dstv, intptr_t i_dst_
     int d8x = mvx & 0x07;
     int d8y = mvy & 0x07;
 
-    ALIGNED_16( uint16_t coeff[4] );
-    coeff[0] = (8-d8x)*(8-d8y);
-    coeff[1] = d8x    *(8-d8y);
-    coeff[2] = (8-d8x)*d8y;
-    coeff[3] = d8x    *d8y;
+    uint16_t coeff0 = (uint16_t)( (8-d8x)*(8-d8y) );
+    uint16_t coeff1 = (uint16_t)( d8x    *(8-d8y) );
+    uint16_t coeff2 = (uint16_t)( (8-d8x)*d8y );
+    uint16_t coeff3 = (uint16_t)( d8x    *d8y );
 
     src += (mvy >> 3) * i_src_stride + (mvx >> 3)*2;
     srcp = &src[i_src_stride];
@@ -474,11 +473,10 @@ static void mc_chroma_4xh_altivec( uint8_t *dstu, uint8_t *dstv, intptr_t i_dst_
     static const vec_u8_t perm1v = CV(2,6,10,14,2,6,10,14,2,6,10,14,2,6,10,14);
 #endif
 
-    coeff0v = vec_ld( 0, coeff );
-    coeff3v = vec_splat( coeff0v, 3 );
-    coeff2v = vec_splat( coeff0v, 2 );
-    coeff1v = vec_splat( coeff0v, 1 );
-    coeff0v = vec_splat( coeff0v, 0 );
+    coeff0v = vec_splats( coeff0 );
+    coeff1v = vec_splats( coeff1 );
+    coeff2v = vec_splats( coeff2 );
+    coeff3v = vec_splats( coeff3 );
     k32v    = vec_sl( vec_splat_u16( 1 ), vec_splat_u16( 5 ) );
     shiftv  = vec_splat_u16( 6 );
 
@@ -542,11 +540,10 @@ static void mc_chroma_8xh_altivec( uint8_t *dstu, uint8_t *dstv, intptr_t i_dst_
     int d8x = mvx & 0x07;
     int d8y = mvy & 0x07;
 
-    ALIGNED_16( uint16_t coeff[4] );
-    coeff[0] = (8-d8x)*(8-d8y);
-    coeff[1] = d8x    *(8-d8y);
-    coeff[2] = (8-d8x)*d8y;
-    coeff[3] = d8x    *d8y;
+    uint16_t coeff0 = (uint16_t)( (8-d8x)*(8-d8y) );
+    uint16_t coeff1 = (uint16_t)( d8x    *(8-d8y) );
+    uint16_t coeff2 = (uint16_t)( (8-d8x)*d8y );
+    uint16_t coeff3 = (uint16_t)( d8x    *d8y );
 
     src += (mvy >> 3) * i_src_stride + (mvx >> 3)*2;
     srcp = &src[i_src_stride];
@@ -559,11 +556,10 @@ static void mc_chroma_8xh_altivec( uint8_t *dstu, uint8_t *dstv, intptr_t i_dst_
     vec_u16_t   src0v_16l, src1v_16l, src2v_16l, src3v_16l, dstv_16l;
     vec_u16_t   shiftv, k32v;
 
-    coeff0v = vec_ld( 0, coeff );
-    coeff3v = vec_splat( coeff0v, 3 );
-    coeff2v = vec_splat( coeff0v, 2 );
-    coeff1v = vec_splat( coeff0v, 1 );
-    coeff0v = vec_splat( coeff0v, 0 );
+    coeff0v = vec_splats( coeff0 );
+    coeff1v = vec_splats( coeff1 );
+    coeff2v = vec_splats( coeff2 );
+    coeff3v = vec_splats( coeff3 );
     k32v    = vec_sl( vec_splat_u16( 1 ), vec_splat_u16( 5 ) );
     shiftv  = vec_splat_u16( 6 );
 
