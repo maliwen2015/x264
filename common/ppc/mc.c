@@ -429,6 +429,12 @@ static void mc_chroma_2xh( uint8_t *dstu, uint8_t *dstv, intptr_t i_dst_stride,
 #define VSLD(a,b,n) vec_sld(b,a,16-n)
 #endif
 
+#ifdef WORDS_BIGENDIAN
+#define VSLD_CHROMA(a,b,n) vec_sld(a,b,n)
+#else
+#define VSLD_CHROMA(a,b,n) vec_sld(a,b,n)
+#endif
+
 #ifndef __POWER9_VECTOR__
 #define STORE4_ALIGNED(d, s) vec_ste( (vec_u32_t)s, 0, (uint32_t*) d )
 #define STORE2_UNALIGNED(d, s) vec_ste( vec_splat( (vec_u16_t)s, 0 ), 0, (uint16_t*)d )
@@ -478,7 +484,7 @@ static void mc_chroma_4xh_altivec( uint8_t *dstu, uint8_t *dstv, intptr_t i_dst_
 
     src2v_8 = vec_vsx_ld( 0, src );
     src2v_16 = vec_u8_to_u16( src2v_8 );
-    src3v_16 = vec_u8_to_u16( VSLD( src2v_8, src2v_8, 2 ) );
+    src3v_16 = vec_u8_to_u16( VSLD_CHROMA( src2v_8, src2v_8, 2 ) );
 
     for( int y = 0; y < i_height; y += 2 )
     {
@@ -486,7 +492,7 @@ static void mc_chroma_4xh_altivec( uint8_t *dstu, uint8_t *dstv, intptr_t i_dst_
         src1v_16 = src3v_16;
         src2v_8 = vec_vsx_ld( 0, srcp );
         src2v_16 = vec_u8_to_u16( src2v_8 );
-        src3v_16 = vec_u8_to_u16( VSLD( src2v_8, src2v_8, 2 ) );
+        src3v_16 = vec_u8_to_u16( VSLD_CHROMA( src2v_8, src2v_8, 2 ) );
 
         dstv16 = vec_mladd( coeff0v, src0v_16, k32v );
         dstv16 = vec_mladd( coeff1v, src1v_16, dstv16 );
@@ -508,7 +514,7 @@ static void mc_chroma_4xh_altivec( uint8_t *dstu, uint8_t *dstv, intptr_t i_dst_
         src1v_16 = src3v_16;
         src2v_8 = vec_vsx_ld( 0, srcp );
         src2v_16 = vec_u8_to_u16( src2v_8 );
-        src3v_16 = vec_u8_to_u16( VSLD( src2v_8, src2v_8, 2 ) );
+        src3v_16 = vec_u8_to_u16( VSLD_CHROMA( src2v_8, src2v_8, 2 ) );
 
         dstv16 = vec_mladd( coeff0v, src0v_16, k32v );
         dstv16 = vec_mladd( coeff1v, src1v_16, dstv16 );
@@ -571,7 +577,7 @@ static void mc_chroma_8xh_altivec( uint8_t *dstu, uint8_t *dstv, intptr_t i_dst_
 
     src2v_8 = vec_vsx_ld( 0, src );
     src3v_8 = vec_vsx_ld( 16, src );
-    src3v_8 = VSLD( src2v_8, src3v_8, 2 );
+    src3v_8 = VSLD_CHROMA( src2v_8, src3v_8, 2 );
 
     for( int y = 0; y < i_height; y += 2 )
     {
@@ -580,7 +586,7 @@ static void mc_chroma_8xh_altivec( uint8_t *dstu, uint8_t *dstv, intptr_t i_dst_
         src2v_8 = vec_vsx_ld( 0, srcp );
         src3v_8 = vec_vsx_ld( 16, srcp );
 
-        src3v_8 = VSLD( src2v_8, src3v_8, 2 );
+        src3v_8 = VSLD_CHROMA( src2v_8, src3v_8, 2 );
 
         src0v_16h = vec_u8_to_u16_h( src0v_8 );
         src0v_16l = vec_u8_to_u16_l( src0v_8 );
@@ -618,7 +624,7 @@ static void mc_chroma_8xh_altivec( uint8_t *dstu, uint8_t *dstv, intptr_t i_dst_
         src2v_8 = vec_vsx_ld( 0, srcp );
         src3v_8 = vec_vsx_ld( 16, srcp );
 
-        src3v_8 = VSLD( src2v_8, src3v_8, 2 );
+        src3v_8 = VSLD_CHROMA( src2v_8, src3v_8, 2 );
 
         src0v_16h = vec_u8_to_u16_h( src0v_8 );
         src0v_16l = vec_u8_to_u16_l( src0v_8 );
