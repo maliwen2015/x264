@@ -1798,6 +1798,7 @@ int x264_ratecontrol_slice_type( x264_t *h, int frame_num )
                 h->thread[i]->param.i_bframe_adaptive = 0;
                 h->thread[i]->param.i_scenecut_threshold = 0;
                 h->thread[i]->param.rc.b_mb_tree = 0;
+                h->thread[i]->param.analyse.i_weighted_pred = 0;
                 if( h->thread[i]->param.i_bframe > 1 )
                     h->thread[i]->param.i_bframe = 1;
             }
