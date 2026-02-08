@@ -981,6 +981,7 @@ static void name( uint8_t *fenc,                                                
     sum0v = vec_splat_s32( 0 );                                                       \
     sum1v = vec_splat_s32( 0 );                                                       \
     sum2v = vec_splat_s32( 0 );                                                       \
+    sum3v = vec_splat_s32( 0 );                                                       \
                                                                                       \
     for( int y = 0; y < ly; y++ )                                                     \
     {                                                                                 \
