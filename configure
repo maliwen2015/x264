@@ -1205,12 +1205,28 @@ elif cc_check 'time.h' '-lrt' 'clock_gettime(CLOCK_MONOTONIC, 0);' ; then
     LDFLAGS="$LDFLAGS -lrt"
 fi
 
+if cc_check 'sys/hwprobe.h' '' 'struct riscv_hwprobe p; p.key = 0;' ; then
+    define HAVE_SYS_HWPROBE_H
+fi
+
+if cc_check 'asm/hwprobe.h' '' 'struct riscv_hwprobe p; p.key = 0;' ; then
+    define HAVE_ASM_HWPROBE_H
+fi
+
 if cc_check 'sys/auxv.h' '' 'getauxval(AT_HWCAP);' ; then
     define HAVE_GETAUXVAL
 fi
 
 if cc_check 'sys/auxv.h' '' 'unsigned long auxv = 0; elf_aux_info(AT_HWCAP, &auxv, sizeof(auxv));' ; then
     define HAVE_ELF_AUX_INFO
+fi
+
+if cc_check 'sys/hwprobe.h asm/hwcap.h sys/auxv.h' '' \
+   'struct riscv_hwprobe p; p.key = RISCV_HWPROBE_KEY_IMA_EXT_0; unsigned long h = getauxval(AT_HWCAP); if (h & COMPAT_HWCAP_ISA_V) riscv_hwprobe(&p, 1, 0, NULL, 0); return 0;' ; then
+    define HAVE_RISCV_HWPROBE
+elif cc_check 'asm/hwprobe.h asm/hwcap.h sys/auxv.h' '' \
+   'struct riscv_hwprobe p; p.key = RISCV_HWPROBE_KEY_IMA_EXT_0; unsigned long h = getauxval(AT_HWCAP); if (h & COMPAT_HWCAP_ISA_V) riscv_hwprobe(&p, 1, 0, NULL, 0); return 0;' ; then
+    define HAVE_RISCV_HWPROBE
 fi
 
 if cc_check 'unistd.h' '' 'sysconf(0);' ; then

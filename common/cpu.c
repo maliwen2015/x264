@@ -27,6 +27,11 @@
 
 #include "base.h"
 
+#if HAVE_SYS_HWPROBE_H
+#include <sys/hwprobe.h>
+#elif HAVE_ASM_HWPROBE_H
+#include <asm/hwprobe.h>
+#endif
 #if HAVE_GETAUXVAL || HAVE_ELF_AUX_INFO
 #include <sys/auxv.h>
 #endif
@@ -463,16 +468,34 @@ uint32_t x264_cpu_detect( void )
 
 #elif HAVE_RISCV64
 
-#define HWCAP_RISCV64_RVV     (1 << ('V' - 'A'))
+#if HAVE_RISCV_HWPROBE
+#include <asm/hwcap.h>
+#endif
 
 uint32_t x264_cpu_detect( void )
 {
     uint32_t flags = 0;
 
-#if HAVE_GETAUXVAL || HAVE_ELF_AUX_INFO
+#if HAVE_RISCV_HWPROBE
     unsigned long hwcap = x264_getauxval( AT_HWCAP );
 
-    if ( hwcap & HWCAP_RISCV64_RVV )
+    if( hwcap & COMPAT_HWCAP_ISA_V )
+    {
+        struct riscv_hwprobe pairs[1];
+        pairs[0].key = RISCV_HWPROBE_KEY_IMA_EXT_0;
+
+        if( riscv_hwprobe( pairs, 1, 0, NULL, 0 ) == 0 )
+        {
+            if( pairs[0].value & RISCV_HWPROBE_IMA_V )
+                flags |= X264_CPU_RVV;
+        }
+    }
+#elif HAVE_GETAUXVAL || HAVE_ELF_AUX_INFO
+    unsigned long hwcap = x264_getauxval( AT_HWCAP );
+
+#define HWCAP_RISCV64_RVV     (1 << ('V' - 'A'))
+
+    if( hwcap & HWCAP_RISCV64_RVV )
         flags |= X264_CPU_RVV;
 #else
 #if HAVE_RVV

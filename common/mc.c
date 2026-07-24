@@ -44,7 +44,9 @@
 #if HAVE_LSX
 #   include "loongarch/mc.h"
 #endif
-
+#if HAVE_RVV
+#include "riscv64/mc.h"
+#endif
 
 static inline void pixel_avg( pixel *dst,  intptr_t i_dst_stride,
                               pixel *src1, intptr_t i_src1_stride,
@@ -693,7 +695,9 @@ void x264_mc_init( uint32_t cpu, x264_mc_functions_t *pf, int cpu_independent )
 #if HAVE_LSX
     x264_mc_init_loongarch( cpu, pf );
 #endif
-
+#if HAVE_RVV
+    x264_mc_init_rvv( cpu, pf );
+#endif
     if( cpu_independent )
     {
         pf->mbtree_propagate_cost = mbtree_propagate_cost;
