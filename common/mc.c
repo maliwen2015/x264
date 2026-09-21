@@ -704,6 +704,9 @@ void x264_mc_init( uint32_t cpu, x264_mc_functions_t *pf, int cpu_independent )
 void x264_frame_filter( x264_t *h, x264_frame_t *frame, int mb_y, int b_end )
 {
     const int b_interlaced = PARAM_INTERLACED;
+    /* The hpel planes are only allocated when subpel refinement is enabled, but the
+     * integral image below is still needed by ESA/TESA. */
+    const int b_hpel = !!h->param.analyse.i_subpel_refine;
     int start = mb_y*16 - 8; // buffer = 4 for deblock + 3 for 6tap, rounded to 8
     int height = (b_end ? frame->i_lines[0] + 16*PARAM_INTERLACED : (mb_y+b_interlaced)*16) + 8;
 
@@ -716,7 +719,7 @@ void x264_frame_filter( x264_t *h, x264_frame_t *frame, int mb_y, int b_end )
         const int width = frame->i_width[p];
         int offs = start*stride - 8; // buffer = 3 for 6tap, aligned to 8 for simd
 
-        if( !b_interlaced || h->mb.b_adaptive_mbaff )
+        if( b_hpel && (!b_interlaced || h->mb.b_adaptive_mbaff) )
             h->mc.hpel_filter(
                 frame->filtered[p][1] + offs,
                 frame->filtered[p][2] + offs,
@@ -732,16 +735,17 @@ void x264_frame_filter( x264_t *h, x264_frame_t *frame, int mb_y, int b_end )
             start = (mb_y*16 >> 1) - 8;
             int height_fld = ((b_end ? frame->i_lines[p] : mb_y*16) >> 1) + 8;
             offs = start*stride - 8;
-            for( int i = 0; i < 2; i++, offs += frame->i_stride[p] )
-            {
-                h->mc.hpel_filter(
-                    frame->filtered_fld[p][1] + offs,
-                    frame->filtered_fld[p][2] + offs,
-                    frame->filtered_fld[p][3] + offs,
-                    frame->plane_fld[p] + offs,
-                    stride, width + 16, height_fld - start,
-                    h->scratch_buffer );
-            }
+            if( b_hpel )
+                for( int i = 0; i < 2; i++, offs += frame->i_stride[p] )
+                {
+                    h->mc.hpel_filter(
+                        frame->filtered_fld[p][1] + offs,
+                        frame->filtered_fld[p][2] + offs,
+                        frame->filtered_fld[p][3] + offs,
+                        frame->plane_fld[p] + offs,
+                        stride, width + 16, height_fld - start,
+                        h->scratch_buffer );
+                }
         }
     }
 
