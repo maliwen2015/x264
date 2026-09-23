@@ -270,7 +270,13 @@ static x264_frame_t *frame_new( x264_t *h, int b_fdec )
         frame->mv16x16++;
 
         if( h->param.analyse.i_me_method >= X264_ME_ESA )
+        {
             frame->integral = (uint16_t*)frame->buffer[3] + frame->i_stride[0] * i_padv + PADH_ALIGN;
+            /* integral_init4h/8h() read from plane[0] - PADH_ALIGN, but expand_border()
+             * only fills up to plane[0] - PADH. Nothing writes the gap, so zero it. */
+            for( int y = 0; y < frame->i_lines[0] + 2*i_padv; y++ )
+                memset( frame->buffer[0] + y * frame->i_stride[0], 0, (PADH_ALIGN - PADH) * SIZEOF_PIXEL );
+        }
     }
     else
     {

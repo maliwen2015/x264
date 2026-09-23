@@ -2473,11 +2473,11 @@ static void fdec_filter_row( x264_t *h, int mb_y, int pass )
     {
         int end = mb_y == h->mb.i_mb_height;
         /* Can't do hpel until the previous slice is done encoding. */
-        if( h->param.analyse.i_subpel_refine )
-        {
+        /* ESA/TESA needs the integral image even when subpel refinement is disabled. */
+        if( h->param.analyse.i_subpel_refine || h->fdec->integral )
             x264_frame_filter( h, h->fdec, min_y, end );
+        if( h->param.analyse.i_subpel_refine )
             x264_frame_expand_border_filtered( h, h->fdec, min_y, end );
-        }
     }
 
     if( SLICE_MBAFF && pass == 0 )
