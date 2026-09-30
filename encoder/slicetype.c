@@ -1758,7 +1758,16 @@ void x264_slicetype_decide( x264_t *h )
     {
         if( h->param.b_vfr_input )
         {
-            if( lookahead_size-- > 1 )
+            if( h->b_vfr_backward )
+            {
+                int64_t pts = h->lookahead->next.list[i]->i_pts;
+                if( h->lookahead->next.list[i]->i_frame > 0 && pts > h->i_vfr_prev_pts )
+                    h->lookahead->next.list[i]->i_duration = 2 * (pts - h->i_vfr_prev_pts);
+                else
+                    h->lookahead->next.list[i]->i_duration = h->i_prev_duration;
+                h->i_vfr_prev_pts = pts;
+            }
+            else if( lookahead_size-- > 1 )
                 h->lookahead->next.list[i]->i_duration = 2 * (h->lookahead->next.list[i+1]->i_pts - h->lookahead->next.list[i]->i_pts);
             else
                 h->lookahead->next.list[i]->i_duration = h->i_prev_duration;

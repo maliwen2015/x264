@@ -318,6 +318,8 @@ struct x264_t
     int64_t         i_disp_fields;  /* Number of displayed fields (both coded and implied via pic_struct) */
     int             i_disp_fields_last_frame;
     int64_t         i_prev_duration; /* Duration of previous frame */
+    int             b_vfr_backward;  /* VFR without lookahead: durations come from the gap to the previous frame */
+    int64_t         i_vfr_prev_pts;
     int64_t         i_coded_fields; /* Number of coded fields (both coded and implied via pic_struct) */
     int64_t         i_cpb_delay;    /* Equal to number of fields preceding this field
                                      * since last buffering_period SEI */
